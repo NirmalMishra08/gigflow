@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/controller/auth.controller.ts","./src/model/auth.model.ts","./src/routes/auth.routes.ts","./src/utils/connectdb.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/controller/auth.controller.ts","./src/model/auth.model.ts","./src/model/bid.model.ts","./src/model/job.model.ts","./src/routes/auth.routes.ts","./src/utils/connectdb.ts","./src/utils/middleware.ts"],"version":"5.9.3"}

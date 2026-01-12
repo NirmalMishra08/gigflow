@@ -13,19 +13,21 @@ declare global {
 export default function Middleware(req: Request, res: Response, next: NextFunction) {
     // middleware logic
     try {
-        const token = req.headers.authorization?.split(" ")[1];
+        const token = req.cookies.token;
         if (!token) {
             return res.status(401).json({ message: "Token not available" });
         }
 
         const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as JwtPayload
 
-        console.log(decoded.id)
-        req.user = decoded.id
+        console.log(decoded)
+        req.user = decoded
 
         next();
     } catch (error) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.clearCookie("token")
+        return res.status(401).json({ message: "Unauthorized" });
     }
 
 }
+

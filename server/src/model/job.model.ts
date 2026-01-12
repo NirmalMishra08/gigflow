@@ -14,6 +14,6 @@ const jobSchema = new Model({
     { timeStamp: true }
 )
 
-const jobs = model("Jobs", jobSchema);
+const Gig = model("Gig", jobSchema);
 
-export default jobs;
+export default Gig;
