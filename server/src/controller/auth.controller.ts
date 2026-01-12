@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 import bcrypt from "bcryptjs";
 import User from '../model/auth.model';
 import sendToken from '../utils/token';
-import { send } from 'node:process';
 
 export const registerUser = async (req: Request, res: Response) => {
     try {
