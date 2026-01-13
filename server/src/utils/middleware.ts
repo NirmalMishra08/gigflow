@@ -18,7 +18,7 @@ export default function Middleware(req: Request, res: Response, next: NextFuncti
             return res.status(401).json({ message: "Token not available" });
         }
 
-        const decoded = jwt.verify(token, process.env.SECRET_KEY as string) as JwtPayload
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload
 
         console.log(decoded)
         req.user = decoded

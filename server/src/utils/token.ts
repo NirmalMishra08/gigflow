@@ -11,6 +11,8 @@ const sendToken = (user: any, statusCode: number, res: Response) => {
         sameSite: 'strict' as const
     };
 
+    console.log(token)
+
     return res.status(statusCode).cookie('token', token, cookieOptions).json({
         status: 'success',
         user: { id: user._id, name: user.name }

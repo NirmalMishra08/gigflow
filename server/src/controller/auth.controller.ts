@@ -12,7 +12,7 @@ export const registerUser = async (req: Request, res: Response) => {
             return res.status(400).json({ message: "something is missing" });
         }
 
-        const alreadyExist = await User.findOne({ email: email.toLowerCase() });
+        const alreadyExist = await User.findOne({ email: email });
 
         if (alreadyExist) {
             return res.status(409).json({ message: "already exist" })
@@ -26,10 +26,10 @@ export const registerUser = async (req: Request, res: Response) => {
             password: hashedPassword
         })
 
+
         const userResponse = user.toObject();
         delete userResponse.password;
-
-        const response = sendToken(user, 201, res)
+        const response = sendToken(userResponse, 201, res)
 
         return response
     } catch (error) {
@@ -43,10 +43,10 @@ export const loginUser = async (req: Request, res: Response) => {
         if (!email || !password) {
             return res.status(400).json({ message: "something is missing" });
         }
-
         const user = await User.findOne({
             email: email
         })
+       
 
         if (!user || !user.password) {
             return res.status(401).json({ message: "invalid credentials" });
@@ -63,12 +63,12 @@ export const loginUser = async (req: Request, res: Response) => {
 
         const userResponse = user.toObject();
         delete userResponse.password;
-        return sendToken(userResponse,200,res);
+        return sendToken(userResponse, 200, res);
 
     } catch (error) {
         return res.status(500).json({
-            success:false,
-            message:"Internal Server Error", 
+            success: false,
+            message: "Internal Server Error",
             error: (error as Error).message
         })
     }

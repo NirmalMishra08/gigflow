@@ -12,12 +12,13 @@ function Middleware(req, res, next) {
         if (!token) {
             return res.status(401).json({ message: "Token not available" });
         }
-        const decoded = jsonwebtoken_1.default.verify(token, process.env.SECRET_KEY);
-        console.log(decoded.id);
-        req.user = decoded.id;
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        console.log(decoded);
+        req.user = decoded;
         next();
     }
     catch (error) {
-        res.status(401).json({ message: "Unauthorized" });
+        res.clearCookie("token");
+        return res.status(401).json({ message: "Unauthorized" });
     }
 }

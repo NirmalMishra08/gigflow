@@ -34,12 +34,19 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const jobSchema = new mongoose_1.Model({
-    title: { type: String, require: true },
-    description: { type: String, require: true },
-    budget: { type: Number, require: true },
+const jobSchema = new mongoose_1.Schema({
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    budget: { type: Number, required: true },
     ownerId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' },
-    status: { type: String, enum: ['open', 'assigned'], default: 'open', message: '{VALUE} is not a valid status' },
-}, { timeStamp: true });
-const jobs = (0, mongoose_1.model)("Jobs", jobSchema);
-exports.default = jobs;
+    status: {
+        type: String,
+        enum: ['open', 'assigned'],
+        default: 'open'
+    },
+}, {
+    timestamps: true
+});
+// 3. Create the Model from the Schema
+const Gig = (0, mongoose_1.model)("Gig", jobSchema);
+exports.default = Gig;

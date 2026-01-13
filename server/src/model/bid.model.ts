@@ -1,7 +1,7 @@
-import mongoose, { Model, model } from "mongoose";
+import mongoose, { Model, model, Schema } from "mongoose";
 
 
-const bidSchema = new Model({
+const bidSchema = new Schema({
     gigId: { type: mongoose.Schema.Types.ObjectId, ref: 'Gig', required: true },
     freeLancerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     message: { type: String },
@@ -10,7 +10,7 @@ const bidSchema = new Model({
 
 }
     , {
-        timeStamps: true
+        timestamps: true
     })
 
 const Bid = model('Bid', bidSchema)

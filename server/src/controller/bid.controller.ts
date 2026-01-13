@@ -123,7 +123,11 @@ export async function getAllBids(req: Request, res: Response) {
             _id: gigId
         })
 
-        if(gig.ownerId != clientId){
+        if (!gig) {
+            return res.status(400).json({ message: "no such gigs" })
+        }
+
+        if (gig.ownerId != clientId) {
             return res.status(400).json("not same owner id")
         }
 

@@ -34,14 +34,14 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const bidSchema = new mongoose_1.Model({
-    gigId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Jobs' },
-    freeLancerId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' },
+const bidSchema = new mongoose_1.Schema({
+    gigId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'Gig', required: true },
+    freeLancerId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
     message: { type: String },
     price: { type: Number },
     status: { type: String, enum: ["pending", "hired", "rejected"] },
 }, {
-    timeStamp: true
+    timestamps: true
 });
 const Bid = (0, mongoose_1.model)('Bid', bidSchema);
 exports.default = Bid;
