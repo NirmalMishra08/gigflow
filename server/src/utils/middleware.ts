@@ -20,7 +20,7 @@ export default function Middleware(req: Request, res: Response, next: NextFuncti
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload
 
-        console.log(decoded)
+    
         req.user = decoded
 
         next();

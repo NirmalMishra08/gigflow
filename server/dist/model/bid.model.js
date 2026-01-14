@@ -39,7 +39,7 @@ const bidSchema = new mongoose_1.Schema({
     freeLancerId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: true },
     message: { type: String },
     price: { type: Number },
-    status: { type: String, enum: ["pending", "hired", "rejected"] },
+    status: { type: String, enum: ["pending", "hired", "rejected"], default: "pending" },
 }, {
     timestamps: true
 });

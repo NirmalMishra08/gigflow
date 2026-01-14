@@ -39,6 +39,7 @@ const jobSchema = new mongoose_1.Schema({
     description: { type: String, required: true },
     budget: { type: Number, required: true },
     ownerId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' },
+    freeLancerId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User' },
     status: {
         type: String,
         enum: ['open', 'assigned'],

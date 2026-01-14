@@ -5,9 +5,11 @@ import { ConnectDB } from "./utils/connectDB";
 import authRoutes from "./routes/auth.routes";
 import gigRoutes from "./routes/gig.routes"
 import cookieParser from "cookie-parser";
+import bidRoutes from "./routes/bid.routes"
 // import { Server } from "socket.io";
 
 import dotenv from "dotenv"
+import { initSocket } from "./utils/socket";
 
 dotenv.config();
 
@@ -21,7 +23,6 @@ app.use(cors({
 app.use(express.json());
 
 
-// REST endpoint example
 app.get("/", (req, res) => {
     return res.send("hello from hello world")
 });
@@ -31,19 +32,14 @@ app.use("/api/auth", authRoutes);
 
 app.use("/api/gigs", gigRoutes)
 
+app.use("/api/bids", bidRoutes)
+
 const server = http.createServer(app);
 
 // // Socket.io setup
-// const io = new Server(server, {
-//   cors: {
-//     origin: "*"
-//   }
-// });
+const io = initSocket(server, "http://localhost:5173");
 
-// // Make io accessible in routes
-// app.set("io", io);
-
-// initSocket(io);
+app.set("io", io);
 
 ConnectDB(process.env.MONGO_URI as string)
     .then(() => server.listen(4000, () => {

@@ -6,14 +6,15 @@ const jobSchema = new Schema(
         description: { type: String, required: true },
         budget: { type: Number, required: true },
         ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-        status: { 
-            type: String, 
-            enum: ['open', 'assigned'], 
-            default: 'open' 
+        freeLancerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        status: {
+            type: String,
+            enum: ['open', 'assigned'],
+            default: 'open'
         },
     },
-    { 
-        timestamps: true 
+    {
+        timestamps: true
     }
 );
 

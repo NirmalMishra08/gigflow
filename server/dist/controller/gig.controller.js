@@ -10,7 +10,6 @@ const auth_model_1 = __importDefault(require("../model/auth.model"));
 async function getAllGigs(req, res) {
     try {
         const { search } = req.query;
-        console.log(search);
         let query = { status: "open" };
         if (search) {
             query.title = { $regex: search, $options: 'i' };
@@ -20,7 +19,6 @@ async function getAllGigs(req, res) {
         const users = await auth_model_1.default.find({
             _id: { $in: ownerIds }
         });
-        console.log(users);
         const combinedData = gigs.map((gig) => {
             const owner = gig.ownerId ? users.find(user => user._id.toString() === gig.ownerId.toString()) : undefined;
             return {
@@ -28,7 +26,6 @@ async function getAllGigs(req, res) {
                 ownerName: owner ? owner.name : "Unknown User"
             };
         });
-        console.log(combinedData);
         return res.status(200).json({
             status: 'success',
             results: gigs.length,
@@ -42,11 +39,9 @@ async function getAllGigs(req, res) {
 async function CreateGig(req, res) {
     try {
         const { title, description, budget } = req.body;
-        console.log(title, description, budget);
         if (!req.user) {
             return res.status(401).json({ message: "User not authenticated" });
         }
-        console.log(req.user);
         if (!title || !description || !budget) {
             return res.status(400).json({ message: "body is missing" });
         }
