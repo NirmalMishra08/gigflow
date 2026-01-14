@@ -4,6 +4,11 @@ import mongoose from "mongoose";
 import Gig from "../model/job.model";
 import { sendNotification } from "../utils/socket";
 
+interface GigStats {
+    active: number;
+    assigned: number;
+}
+
 export async function CreateBid(req: Request, res: Response) {
     try {
         const { gigId, message, price } = req.body
@@ -225,7 +230,7 @@ export const getAllBidsForClients = async (req: Request, res: Response) => {
             ownerId: userId
         })
 
-        const openGigs = allGigs.reduce((acc, gig) => {
+        const openGigs = allGigs.reduce((acc: GigStats, gig: any) => {
             if (gig.status === "open") acc.active++;
             if (gig.status === 'assigned') acc.assigned++;
             return acc;

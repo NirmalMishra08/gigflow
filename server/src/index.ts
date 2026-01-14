@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import http from "http";
 import cors from "cors";
 import { ConnectDB } from "./utils/connectDB";
@@ -22,7 +22,7 @@ app.use(cors({
 app.use(express.json());
 
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
     return res.send("hello from hello world")
 });
 
