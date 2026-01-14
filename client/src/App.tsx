@@ -18,7 +18,7 @@ function App() {
             }}
           />
           <Navbar />
-          <main className="flex-grow h-full ">
+          <main className="grow h-full ">
             <Outlet />
           </main>
           <Footer />
