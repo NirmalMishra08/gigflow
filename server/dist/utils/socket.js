@@ -22,7 +22,7 @@ exports.initSocket = initSocket;
 const sendNotification = (userId, message) => {
     const socketId = userSockets.get(userId);
     if (socketId && io) {
-        io.to(socketId).emit("notification", message);
+        io.to(socketId).emit("notification", { message });
     }
 };
 exports.sendNotification = sendNotification;

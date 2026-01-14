@@ -11,13 +11,13 @@ const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const gig_routes_1 = __importDefault(require("./routes/gig.routes"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const bid_routes_1 = __importDefault(require("./routes/bid.routes"));
-// import { Server } from "socket.io";
 const dotenv_1 = __importDefault(require("dotenv"));
+const socket_1 = require("./utils/socket");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     credentials: true
 }));
 app.use(express_1.default.json());
@@ -28,18 +28,12 @@ app.use("/api/auth", auth_routes_1.default);
 app.use("/api/gigs", gig_routes_1.default);
 app.use("/api/bids", bid_routes_1.default);
 const server = http_1.default.createServer(app);
-// // Socket.io setup
-// const io = new Server(server, {
-//   cors: {
-//     origin: "*"
-//   }
-// });
-// // Make io accessible in routes
-// app.set("io", io);
-// initSocket(io);
+// Socket.io setup
+const io = (0, socket_1.initSocket)(server, process.env.CLIENT_URL);
+app.set("io", io);
 (0, connectDB_1.ConnectDB)(process.env.MONGO_URI)
-    .then(() => server.listen(4000, () => {
-    console.log(" Server running on http://localhost:4000");
+    .then(() => server.listen(process.env.PORT, () => {
+    console.log(" Server running on http://localhost:PORT");
 }))
     .catch((err) => {
     console.log("Error connecting mongodb", err);

@@ -6,7 +6,6 @@ import authRoutes from "./routes/auth.routes";
 import gigRoutes from "./routes/gig.routes"
 import cookieParser from "cookie-parser";
 import bidRoutes from "./routes/bid.routes"
-// import { Server } from "socket.io";
 
 import dotenv from "dotenv"
 import { initSocket } from "./utils/socket";
@@ -17,7 +16,7 @@ const app = express();
 app.use(cookieParser());
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     credentials: true
 }));
 app.use(express.json());
@@ -36,14 +35,14 @@ app.use("/api/bids", bidRoutes)
 
 const server = http.createServer(app);
 
-// // Socket.io setup
-const io = initSocket(server, "http://localhost:5173");
+// Socket.io setup
+const io = initSocket(server, process.env.CLIENT_URL as string);
 
 app.set("io", io);
 
 ConnectDB(process.env.MONGO_URI as string)
-    .then(() => server.listen(4000, () => {
-        console.log(" Server running on http://localhost:4000");
+    .then(() => server.listen(process.env.PORT, () => {
+        console.log(" Server running on http://localhost:PORT");
     }))
     .catch((err) => {
         console.log("Error connecting mongodb", err)

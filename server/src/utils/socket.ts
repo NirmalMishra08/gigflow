@@ -24,6 +24,6 @@ export const initSocket = (server: HttpServer, clientPort: string) => {
 export const sendNotification = (userId: string, message: string) => {
     const socketId = userSockets.get(userId);
     if (socketId && io) {
-        io.to(socketId).emit("notification", message);
+        io.to(socketId).emit("notification", { message });
     }
 }
