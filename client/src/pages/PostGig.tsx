@@ -1,36 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGig } from '../context/GigContext';
+import toast from 'react-hot-toast';
 
 const PostGig = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [budget, setBudget] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { postGigs } = useGig();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
-    // TODO: Replace with actual API call
     try {
-      // await axios.post('/api/gigs', { title, description, budget });
-      if (budget === null) {
-        setError('Budget is required');
-        setLoading(false);
-        return;
-      }
       await postGigs(title, description, budget);
-      console.log('Posting gig:', { title, description, budget });
-      setTimeout(() => {
-        navigate('/gigs');
-      }, 1000);
+      toast.success('Gig posted successfully');
+      navigate('/gigs');
     } catch (err: any) {
-      setError(err.message || 'Failed to post gig. Please try again.');
+      toast.error(err?.message || 'Failed to post gig. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -42,11 +32,6 @@ const PostGig = () => {
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Post a New Gig</h1>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-              {error}
-            </div>
-          )}
 
           <div className="space-y-6">
             <div>

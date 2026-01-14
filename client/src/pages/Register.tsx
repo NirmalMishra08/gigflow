@@ -1,34 +1,32 @@
-import React, { useState, type EventHandler } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      toast.error('Password must be at least 6 characters long');
       return;
     }
 
     setLoading(true);
 
-    console.log(name, email, password)
-
     try {
       await register(name, email, password);
+      toast.success('Account created successfully');
       navigate('/gigs');
     } catch (err: any) {
-      setError(err.message || 'Registration failed. Please try again.');
+      toast.error(err?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -93,12 +91,13 @@ const Register = () => {
 
         <button
           type="submit"
+          disabled={loading}
           className="mt-8 py-3 w-full cursor-pointer rounded-md bg-indigo-600 text-white transition hover:bg-indigo-700"
         >
-          Sign Up
+          {loading ? 'Creating account...' : 'Sign Up'}
         </button>
         <p className='text-center py-8'>
-          Already have an account? <a href="/login" className="text-indigo-600 hover:underline">Log In</a>
+          Already have an account? <Link to="/login" className="text-indigo-600 hover:underline">Log In</Link>
         </p>
       </form>
     </main>

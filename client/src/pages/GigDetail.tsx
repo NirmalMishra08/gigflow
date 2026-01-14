@@ -1,19 +1,68 @@
-import { useParams, Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useState } from "react";
+import { useGig } from "../context/GigContext";
+import toast from "react-hot-toast";
 
 function GigDetail() {
-  const { id } = useParams();
   const { user } = useAuth();
+  const location = useLocation();
+  const [message, setMessage] = useState("");
+  const [price, setPrice] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+
+
+  const currentGig = location.state?.gigData;
+  if (!currentGig) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Gig not found</h1>
+            <p className="text-gray-600 mb-6">
+              Please go back to the gig list and open a gig again.
+            </p>
+            <Link
+              to="/gigs"
+              className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Back to Gigs
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const { submitBid } = useGig();
+
+  const handleSubmit = async (id: string, message: string, price: string) => {
+
+    setLoading(true);
+
+    try {
+      await submitBid(id, message, price);
+      toast.success('Bid submitted');
+      navigate('/gigs');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to submit bid');
+    } finally {
+      setLoading(false);
+    }
+  }
+
 
   // Mock data - replace with actual API call
   const gig = {
-    id: id,
-    title: 'Web Development Project',
-    description: 'We are looking for an experienced full-stack developer to build a modern web application. The project involves React frontend and Node.js backend.',
-    budget: '$5000',
-    postedBy: 'Client A',
-    postedDate: '2024-01-15',
-    status: 'Open',
+    id: currentGig._id,
+    title: currentGig.title,
+    description: currentGig.description,
+    budget: `${currentGig.budget}`,
+    postedBy: currentGig.ownerName,
+    postedDate: currentGig.createdAt,
+    status: currentGig.status,
   };
 
   return (
@@ -44,7 +93,7 @@ function GigDetail() {
 
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Budget</h2>
-            <p className="text-2xl font-bold text-blue-600">{gig.budget}</p>
+            <p className="text-2xl font-bold text-blue-600">₹{gig.budget}</p>
           </div>
 
           {user && (
@@ -53,8 +102,15 @@ function GigDetail() {
               <p className="text-gray-600 mb-4">
                 Interested in this project? Submit your bid and proposal.
               </p>
-              <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                Submit Bid
+              <input value={price} onChange={(e) => setPrice(e.target.value)} type="text" placeholder="Submit Your Bid Price" className="border my-4 px-3 py-2 rounded-2xl" />
+              <textarea className="rounded-3xl w-full h-fit border p-4" placeholder="Submit Your Message for the owners" onChange={(e) => setMessage(e.target.value)} name="message" value={message} id="">
+              </textarea>
+              <button
+                disabled={loading}
+                onClick={() => handleSubmit(gig.id, message, price)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors font-medium"
+              >
+                {loading ? 'Submitting...' : 'Submit Bid'}
               </button>
             </div>
           )}

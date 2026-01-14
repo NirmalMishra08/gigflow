@@ -1,14 +1,77 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useEffect, useState } from 'react';
+import BidsModal from '../components/BidsModal';
+import { useGig } from '../context/GigContext';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 function ClientDashboard() {
   const { user } = useAuth();
+  const { getClientGigs, hireFreeLancer } = useGig();
 
-  // Mock data - replace with actual API call
-  const postedGigs = [
-    { id: '1', title: 'Web Development Project', bids: 5, status: 'Open' },
-    { id: '2', title: 'Logo Design', bids: 3, status: 'Open' },
-  ];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedGig, setSelectedGig] = useState<any>(null);
+  const [currentBids, setCurrentBids] = useState([]);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        const data = await getClientGigs();
+        setStats(data);
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to load dashboard');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardData();
+  }, []);
+
+  const openBids = async (gig: any) => {
+    setSelectedGig(gig);
+    setIsModalOpen(true);
+    setModalLoading(true);
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/bids/${gig._id}`);
+      setCurrentBids(res.data.data);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load bids');
+      setIsModalOpen(false);
+
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleHireReject = async (bidId: string) => {
+    try {
+      setLoading(true);
+      await hireFreeLancer(bidId);
+      toast.success('Freelancer hired successfully');
+      setIsModalOpen(false);
+      navigate(0);
+    } catch (err) {
+      toast.error("Action failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading || !stats) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -27,53 +90,65 @@ function ClientDashboard() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800">
               Welcome back, <span className="font-semibold">{user.name}</span>!
+              <span className='ml-2 text-blue-600/80 text-sm'>Click on a gig card to manage bids</span>
             </p>
           </div>
         )}
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-medium mb-2">Total Gigs Posted</h3>
-            <p className="text-3xl font-bold text-gray-900">{postedGigs.length}</p>
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <h3 className="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Total Gigs</h3>
+            <p className="text-3xl font-bold text-gray-900">{stats.totalGigs}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-medium mb-2">Total Bids</h3>
-            <p className="text-3xl font-bold text-gray-900">
-              {postedGigs.reduce((sum, gig) => sum + gig.bids, 0)}
-            </p>
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <h3 className="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Bids Received</h3>
+            <p className="text-3xl font-bold text-gray-900">{stats.totalBidsReceived}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-gray-600 text-sm font-medium mb-2">Active Gigs</h3>
-            <p className="text-3xl font-bold text-gray-900">
-              {postedGigs.filter(gig => gig.status === 'Open').length}
-            </p>
+          <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+            <h3 className="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-2">Active Gigs</h3>
+            <p className="text-3xl font-bold text-gray-900">{stats.activeGigs}</p>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your Posted Gigs</h2>
-          {postedGigs.length === 0 ? (
-            <p className="text-gray-600">You haven't posted any gigs yet.</p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">Your Posted Gigs</h2>
+          {!stats.AllGigs || stats.AllGigs.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-gray-500 mb-4">You haven't posted any gigs yet.</p>
+              <Link to="/post-gig" className="text-blue-600 font-medium hover:underline">Create your first gig now</Link>
+            </div>
           ) : (
-            <div className="space-y-4">
-              {postedGigs.map((gig) => (
+            <div className="grid gap-4">
+              {stats.AllGigs.map((gig: any) => (
                 <div
-                  key={gig.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                  key={gig._id}
+                  onClick={() => openBids(gig)}
+                  className="group flex justify-between items-center border border-gray-100 rounded-xl p-5 hover:border-blue-300 hover:bg-blue-50/50 transition-all cursor-pointer shadow-sm"
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <Link
-                        to={`/gigs/${gig.id}`}
-                        className="text-xl font-semibold text-blue-600 hover:underline"
-                      >
-                        {gig.title}
-                      </Link>
-                      <p className="text-gray-600 mt-1">{gig.bids} bids received</p>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {gig.title}
+                    </h3>
+                    <div className="flex items-center gap-4 mt-2">
+                      <span className="text-sm text-gray-500 flex items-center gap-1">
+                        Budget: <span className="text-gray-900 font-medium">₹{gig.budget}</span>
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Posted: {new Date(gig.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${gig.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
                       {gig.status}
                     </span>
+                    <div className="text-gray-400 group-hover:text-blue-500 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="9 5l7 7-7 7" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -81,6 +156,15 @@ function ClientDashboard() {
           )}
         </div>
       </div>
+
+      <BidsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        gigTitle={selectedGig?.title || ""}
+        bids={currentBids}
+        onAction={handleHireReject}
+        loading={modalLoading}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import axios from 'axios';
 
 interface User {
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  
+
   axios.defaults.withCredentials = true;
 
   const checkAuth = async () => {
@@ -50,7 +50,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
       });
       if (response.data.user) {
-        console.log(response)
         setUser(response.data.user);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
@@ -66,9 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
       });
-      console.log(user,email,password);
       if (response.data.user) {
-        console.log(response)
         setUser(response.data.user);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
@@ -79,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await axios.post(`${API_URL}/auth/logout`).catch(() => {});
+      await axios.post(`${API_URL}/auth/logout`).catch(() => { });
       setUser(null);
       localStorage.removeItem('user');
     } catch (error) {
