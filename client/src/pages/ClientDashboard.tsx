@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useEffect, useState } from 'react';
 import BidsModal from '../components/BidsModal';
@@ -16,21 +16,21 @@ function ClientDashboard() {
   const [modalLoading, setModalLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const data = await getClientGigs();
+      setStats(data);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load dashboard');
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        const data = await getClientGigs();
-        setStats(data);
-      } catch (err) {
-        console.error(err);
-        toast.error('Failed to load dashboard');
-      } finally {
-        setLoading(false);
-      }
-    };
+
     fetchDashboardData();
   }, []);
 
@@ -57,7 +57,7 @@ function ClientDashboard() {
       await hireFreeLancer(bidId);
       toast.success('Freelancer hired successfully');
       setIsModalOpen(false);
-      navigate(0);
+      await fetchDashboardData();
     } catch (err) {
       toast.error("Action failed");
     } finally {
